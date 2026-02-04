@@ -15,7 +15,8 @@ state-muuttujaan.
 */
 struct State
 {
-	Player player;
+	Player		player;
+	Texture2D	map;
 }
 
 /*
@@ -51,9 +52,13 @@ Suoritetaan kerran ohjelman alussa
 */
 fn void init()
 {
-	rl::setTraceLogLevel(rl::TraceLogLevel.WARNING);
-    rl::setTargetFPS(120);
+	rl::setTraceLogLevel(rl::TraceLogLevel.INFO);
+	rl::setConfigFlags(rl::FLAG_VSYNC_HINT);
 	rl::initWindow(SCREENW, SCREENH, "Working title");
+
+	// Ladataan kartta
+	Texture2D map = rl::loadTexture("resources/testikartta.png");
+	state.map = map;
 }
 
 /*
@@ -81,7 +86,7 @@ fn void update()
 }
 
 /*
-Piirretään frame pelin tilasta. Tämä tehdään kerran per frame (duh).
+Piirretään frame pelin tilasta. Tämä tehdään kerran per frame.
 */
 fn void draw() 
 {
@@ -91,17 +96,20 @@ fn void draw()
     defer rl::endDrawing();
 
     rl::clearBackground({25, 25, 25, 255}); // RGBA-arvo taustavärille
-    
+
+	// Kartan piirtäminen
+	Rectangle src = {state.player.position.x, state.player.position.y, SCREENW, SCREENH};
+    rl::drawTextureRec(state.map, src, {0, 0}, rl::WHITE);
+
     /*
     Alias pelaajan paikasta. Tällä kertaa tyyppi on arvo eikä pointteri,
     sillä meidän ei tarvitse muuttaa pelaajan paikkaa, haluamme vain tietää sen.
     */
-    Vec2 p_pos = state.player.position; 
 
     // Piirretään punainen ympyrä pelaajan paikalle
     rl::drawCircle(
-        (int)p_pos.x,
-        (int)p_pos.y,
+		SCREENW/2,
+		SCREENH/2,
         20,
         rl::RED
     );
@@ -115,4 +123,3 @@ fn void exit()
 {
 	rl::closeWindow();
 }
-
